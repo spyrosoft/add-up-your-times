@@ -1,0 +1,48 @@
+/* Colors */
+body, textarea, button {
+  background-color: #000000;
+  color: #0055ff;
+  border-color: #0055ff; }
+
+/* General */
+* {
+  margin: 0;
+  padding: 0; }
+
+body {
+  text-align: center;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 13.5px;
+  margin: 20px; }
+
+section {
+  margin: 20px auto;
+  max-width: 600px; }
+
+input[type="text"], select {
+  font-size: inherit;
+  font-family: inherit; }
+
+label textarea {
+  display: block;
+  margin: 20px auto; }
+
+label, button {
+  cursor: pointer; }
+
+textarea, button {
+  font-size: inherit;
+  font-family: inherit;
+  border-width: 2px;
+  border-style: solid; }
+
+textarea {
+  width: 90%;
+  height: 200px;
+  padding: 8px; }
+
+button {
+  padding: 6px 20px; }
+
+/*# sourceMappingURL=app.css.map */
