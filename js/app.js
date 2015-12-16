@@ -102,7 +102,7 @@ function collect_time_entries_difference(start_time, stop_time)
 	var stop_minutes = convert_time_to_minutes(stop_time);
 	if ( stop_minutes < start_minutes )
 	{
-		stop_minutes += 12 * 60;
+		stop_minutes += 24 * 60;
 	}
 	var time_difference = stop_minutes - start_minutes;
 	return time_difference;
@@ -124,9 +124,9 @@ function convert_time_to_minutes(time)
 	var minutes = parseInt(
 		time.replace(HOUR_AND_COLON, '').replace(AM_PM, '')
 	);
-	var is_am = time.match(AM_ONLY);
-	if (hours == 12 && is_am ) { is_am = !is_am; }
-	if (is_am) { hours += 12; }
+	var is_pm = time.match(PM_ONLY);
+	if (hours == 12 ) { is_pm = !is_pm; }
+	if (is_pm) { hours += 12; }
 	return (hours * 60) + minutes;
 }
 
@@ -190,7 +190,55 @@ var test_input = [
 	'8:00 pm - 9:00 pm',
 	'9:00 pm - 10:00 pm',
 	'10:00 pm - 11:00 pm',
-	'11:00 pm - 12:00 am'
+	'11:00 pm - 12:00 am',
+	'12:00 am - 2:00 am', //2 Hour Intervals
+	'1:00 am - 3:00 am',
+	'2:00 am - 4:00 am',
+	'3:00 am - 5:00 am',
+	'4:00 am - 6:00 am',
+	'5:00 am - 7:00 am',
+	'6:00 am - 8:00 am',
+	'7:00 am - 9:00 am',
+	'8:00 am - 10:00 am',
+	'9:00 am - 11:00 am',
+	'10:00 am - 12:00 pm',
+	'11:00 am - 1:00 pm',
+	'12:00 pm - 2:00 pm',
+	'1:00 pm - 3:00 pm',
+	'2:00 pm - 4:00 pm',
+	'3:00 pm - 5:00 pm',
+	'4:00 pm - 6:00 pm',
+	'5:00 pm - 7:00 pm',
+	'6:00 pm - 8:00 pm',
+	'7:00 pm - 9:00 pm',
+	'8:00 pm - 10:00 pm',
+	'9:00 pm - 11:00 pm',
+	'10:00 pm - 12:00 am',
+	'11:00 pm - 1:00 am',
+	'12:00 am - 8:00 am', //8 Hour Intervals
+	'1:00 am - 9:00 am',
+	'2:00 am - 10:00 am',
+	'3:00 am - 11:00 am',
+	'4:00 am - 12:00 pm',
+	'5:00 am - 1:00 pm',
+	'6:00 am - 2:00 pm',
+	'7:00 am - 3:00 pm',
+	'8:00 am - 4:00 pm',
+	'9:00 am - 5:00 pm',
+	'10:00 am - 6:00 pm',
+	'11:00 am - 7:00 pm',
+	'12:00 pm - 8:00 pm',
+	'1:00 pm - 9:00 pm',
+	'2:00 pm - 10:00 pm',
+	'3:00 pm - 11:00 pm',
+	'4:00 pm - 12:00 am',
+	'5:00 pm - 1:00 am',
+	'6:00 pm - 2:00 am',
+	'7:00 pm - 3:00 am',
+	'8:00 pm - 4:00 am',
+	'9:00 pm - 5:00 am',
+	'10:00 pm - 6:00 am',
+	'11:00 pm - 7:00 am'
 ];
 var test_expected_output = '1 hour - 0 minutes';
 
