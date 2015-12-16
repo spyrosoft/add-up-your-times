@@ -1,93 +1,111 @@
+// --------------------Globals-------------------- //
+
+var previous_input;
+var previous_output;
+
+var COLON_AND_MINUTES = /:\d\d\s*[A|P]M/i;
+var HOUR_AND_COLON = /^\d[\d]?:/;
+var AM_PM = /[A|P]M/i;
+var PM_ONLY = /PM/i;
+var AM_ONLY = /AM/i;
+
+
+
+
+// --------------------Initialization-------------------- //
+
+// ----------Event Listeners---------- //
 document.getElementById('input').select();
-document.getElementById('add_batch_time_button').addEventListener('click', add_up_your_times);
+document.getElementById('add_batch_time_button').addEventListener('click', add_up_times);
 document.getElementById('input').addEventListener(
 	'keydown',
 	function (key_event)
 	{
-		call_function_on_enter(key_event, add_up_your_times);
+		call_function_on_enter(key_event, add_up_times_user_event);
 	}
 );
 
-var input_check = /\d+:\d\d\s*[A|P]M\s-\s\d+:\d\d\s*[A|P]M/gi;
-var full_time = /^\d+:\d\d\s*[A|P]M$/i;
-var colon_and_minutes = /:\d\d\s*[A|P]M$/i;
-var hour_and_colon = /^\d+:/;
-var am_pm = /\s*[A|P]M/i;
-var pm_only = /\s*PM/i;
 
-var previous_input;
-var total_minutes = 0;
 
-var previous_start_time, previous_stop_time;
 
-function add_up_your_times()
+// --------------------Functionality-------------------- //
+
+function add_up_times_user_event()
 {
 	var input = document.getElementById('input').value;
-	if ( input != previous_input && input != '' )
+	var total_minutes = add_up_times(input);
+	document.getElementById('total').innerHTML
+		= convert_minutes_to_time(total_minutes);
+}
+
+function add_up_times(input)
+{
+	if ( input === previous_input || input === '' ) { return previous_output; }
+	
+	reset_global_state( input );
+	
+	var full_time_entries = collect_full_time_entries(input);
+	var time_entries = split_full_time_entries(full_time_entries);
+	var total_minutes = add_time_entries(time_entries);
+	previous_output = total_minutes;
+	return total_minutes;
+}
+
+function reset_global_state(input)
+{
+	previous_input = input;
+	document.getElementById('total').innerHTML = '';
+}
+
+function collect_full_time_entries(input)
+{
+	var full_time_entry_regex = /\d[\d]?:\d\d\s*[A|P]M\s*-\s*\d[\d]?:\d\d\s*[A|P]M/gi;
+	return input.match(full_time_entry_regex);
+}
+
+function split_full_time_entries(full_time_entries)
+{
+	var time_entries = new Array();
+	for (var counter = 0; counter < full_time_entries.length; counter++)
 	{
-		total_minutes = 0;
-		document.getElementById('total').innerHTML = '';
-		previous_input = input;
-		var batch_times = input.match(input_check);
-		add_batch_times(batch_times);
+		var index_of_dash = full_time_entries[counter].indexOf('-');
+		var new_start_time
+			= full_time_entries[counter]
+				.substring(0, index_of_dash)
+				.replace(/ /g, '');
+		var new_stop_time
+			= full_time_entries[counter]
+				.substring(index_of_dash + 1, full_time_entries[counter].length)
+				.replace(/ /g, '');
+		time_entries[ counter ] = [new_start_time, new_stop_time];
 	}
+	return time_entries;
 }
 
-function run_input(input)
+function add_time_entries(time_entries)
 {
-	if ( input != previous_input )
+	var total_minutes = 0;
+	for (var i = 0; i < time_entries.length; i++)
 	{
-		total_minutes = 0;
-		document.getElementById('total').innerHTML = '';
-		previous_input = input;
-		var batch_times = input.match(input_check);
-		add_batch_times(batch_times);
+		var time_difference = collect_time_entries_difference(
+			time_entries[i][0],
+			time_entries[i][1]
+		);
+		total_minutes += time_difference;
 	}
+	return total_minutes;
 }
 
-function check_batch_time_input(input)
+function collect_time_entries_difference(start_time, stop_time)
 {
-	return ! input.match(input_check);
-}
-
-function add_batch_times(batch_times)
-{
-	for (var counter = 0; counter < batch_times.length; counter++)
+	var start_minutes = convert_time_to_minutes(start_time);
+	var stop_minutes = convert_time_to_minutes(stop_time);
+	if ( stop_minutes < start_minutes )
 	{
-		var index_of_dash = batch_times[counter].indexOf('-');
-		var new_start_time = batch_times[counter].substring(0, index_of_dash - 1);
-		var new_stop_time = batch_times[counter].substring(index_of_dash + 2, batch_times[counter].length);
-		display_new_time(new_start_time, new_stop_time);
-		add_to_total_time(new_start_time, new_stop_time);
+		stop_minutes += 12 * 60;
 	}
-}
-
-function check_start_time(input_time)
-{
-	if (input_time.match(full_time) && input_time != previous_start_time)
-	{
-		previous_start_time = input_time;
-		document.getElementById('stop_time').select();
-	}
-}
-
-function check_stop_time(input_time)
-{
-	if (input_time.match(full_time) && input_time != previous_stop_time)
-	{
-		previous_stop_time = input_time;
-		var new_start_time = document.getElementById('start_time').value;
-		var new_stop_time = document.getElementById('stop_time').value;
-		add_single_time(new_start_time, new_stop_time);
-		clear_time_values();
-		document.getElementById('start_time').select();
-	}
-}
-
-function add_single_time(new_start_time, new_stop_time)
-{
-	display_new_time(new_start_time, new_stop_time);
-	add_to_total_time(new_start_time, new_stop_time);
+	var time_difference = stop_minutes - start_minutes;
+	return time_difference;
 }
 
 function display_new_time(new_start_time, new_stop_time)
@@ -100,23 +118,16 @@ function display_new_time(new_start_time, new_stop_time)
 	document.getElementById('total').appendChild(new_time_to_display);
 }
 
-function add_to_total_time(new_start_time, new_stop_time)
-{
-	total_minutes += (convert_time_to_minutes(new_stop_time)
-					  - convert_time_to_minutes(new_start_time));
-	document.getElementById('total').innerHTML = convert_minutes_to_time(total_minutes);
-}
-
 function convert_time_to_minutes(time)
 {
-	var hours = time.replace(colon_and_minutes, '');
-	var minutes = time.replace(hour_and_colon, '');
-	minutes = minutes.replace(am_pm, '');
-	if (hours != 12 && time.match(pm_only))
-	{
-		hours = parseInt(hours) + 12;
-	}
-	return (parseInt(hours) * 60) + (parseInt(minutes));
+	var hours = parseInt(time.replace(COLON_AND_MINUTES, ''));
+	var minutes = parseInt(
+		time.replace(HOUR_AND_COLON, '').replace(AM_PM, '')
+	);
+	var is_am = time.match(AM_ONLY);
+	if (hours == 12 && is_am ) { is_am = !is_am; }
+	if (is_am) { hours += 12; }
+	return (hours * 60) + minutes;
 }
 
 function convert_minutes_to_time(minutes_to_convert)
@@ -141,24 +152,53 @@ function convert_minutes_to_time(minutes_to_convert)
 	return time;
 }
 
-function clear_time_values()
-{
-	previous_start_time = previous_stop_time = null;
-	document.getElementById('start_time').value
-		= document.getElementById('stop_time').value
-		= '';
-}
-
-function display_error(error)
-{
-	document.getElementById('error').innerHTML = error;
-}
-
 function call_function_on_enter(key_event, function_to_call)
 {
+	if ( key_event.altKey || key_event.ctrlKey || key_event.metaKey ) { return; }
+	if ( key_event.shiftKey ) { return; }
+	
 	if ( key_event.keyCode === 13 )
 	{
 		key_event.preventDefault();
 		function_to_call();
 	}
 }
+
+
+var test_results = '';
+var test_input = [
+	'12:00 am - 1:00 am',
+	'1:00 am - 2:00 am',
+	'2:00 am - 3:00 am',
+	'3:00 am - 4:00 am',
+	'4:00 am - 5:00 am',
+	'5:00 am - 6:00 am',
+	'6:00 am - 7:00 am',
+	'7:00 am - 8:00 am',
+	'8:00 am - 9:00 am',
+	'9:00 am - 10:00 am',
+	'10:00 am - 11:00 am',
+	'11:00 am - 12:00 pm',
+	'12:00 pm - 1:00 pm',
+	'1:00 pm - 2:00 pm',
+	'2:00 pm - 3:00 pm',
+	'3:00 pm - 4:00 pm',
+	'4:00 pm - 5:00 pm',
+	'5:00 pm - 6:00 pm',
+	'6:00 pm - 7:00 pm',
+	'7:00 pm - 8:00 pm',
+	'8:00 pm - 9:00 pm',
+	'9:00 pm - 10:00 pm',
+	'10:00 pm - 11:00 pm',
+	'11:00 pm - 12:00 am'
+];
+var test_expected_output = '1 hour - 0 minutes';
+
+function run_test_suite()
+{
+	for (var i = 0; i < test_input.length; i++) {
+		console.log(test_input[i], convert_minutes_to_time(add_up_times(test_input[i])));
+	}
+}
+
+if ( window.location.hash.match(/test/) ) { run_test_suite(); }
