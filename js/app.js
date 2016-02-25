@@ -60,7 +60,7 @@ function reset_global_state(input)
 function collect_full_time_entries(input)
 {
 	var full_time_entry_regex = /\d[\d]?:\d\d\s*[A|P]M\s*-\s*\d[\d]?:\d\d\s*[A|P]M/gi;
-	return input.match(full_time_entry_regex);
+	return input.toString().match(full_time_entry_regex);
 }
 
 function split_full_time_entries(full_time_entries)
