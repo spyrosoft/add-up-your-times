@@ -16,7 +16,7 @@ var AM_ONLY = /AM/i;
 
 // ----------Event Listeners---------- //
 document.getElementById('input').select();
-document.getElementById('add_batch_time_button').addEventListener('click', add_up_times);
+document.getElementById('add_batch_time_button').addEventListener('click', add_up_times_user_event);
 document.getElementById('input').addEventListener(
 	'keydown',
 	function (key_event)
