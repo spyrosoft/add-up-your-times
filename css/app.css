@@ -1,5 +1,5 @@
 /* Colors */
-body, textarea, button {
+body, textarea, button, input {
   background-color: #000000;
   color: #0055ff;
   border-color: #0055ff; }

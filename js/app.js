@@ -33,9 +33,9 @@ document.getElementById('input').addEventListener(
 function add_up_times_user_event()
 {
 	var input = document.getElementById('input').value;
-	var total_minutes = add_up_times(input);
+	var total = add_up_times(input);
 	document.getElementById('total').innerHTML
-		= convert_minutes_to_time(total_minutes);
+		= convert_minutes_to_time(total);
 }
 
 function add_up_times(input)
@@ -148,6 +148,14 @@ function convert_minutes_to_time(minutes_to_convert)
 	else
 	{
 		time = hours + ' hours - ' + minutes + ' minutes';
+	}
+	if ( document.getElementById( 'rate' ).value != '' ) {
+		var rate = parseFloat(document.getElementById( 'rate' ).value);
+		var total = rate * hours;
+		if ( minutes != 0 ) {
+			total += Math.ceil( minutes / 60 * 100 ) * rate / 100;
+		}
+		time = time + '<br>$' + total;
 	}
 	return time;
 }
